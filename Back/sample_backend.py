@@ -1,10 +1,13 @@
 from flask import Flask
 from flask import request
 from flask import jsonify
+from flask_cors import CORS
 import json
-
+import string
+import random
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/')
 def hello_world():
@@ -67,8 +70,11 @@ def get_users():
       return users
    elif request.method == 'POST':
       userToAdd = request.get_json()
+      userToAdd['id'] = randomString()
       users['users_list'].append(userToAdd)
-      resp = jsonify(success=True)
+      data = users
+      resp = jsonify(userToAdd), 201
+      #resp = jsonify(success=True, users[users_list]), 201
       #resp.status_code = 200 #optionally, you can always set a response code. 
       # 200 is the default code for a normal response
       return resp
@@ -76,10 +82,17 @@ def get_users():
       # need to send whole user to the request
       userToDelete = request.get_json()
       users['users_list'].remove(userToDelete)
-      resp = jsonify(success=True)
+      resp = jsonify(userToDelete), 200
       #resp.status_code = 200 #optionally, you can always set a response code. 
       # 200 is the default code for a normal response
       return resp
+
+def randomString():
+   letters = string.ascii_lowercase
+   digits = string.digits
+   randStr = (''.join(random.choice(letters) for i in range(3)))
+   randDigs = (''.join(random.choice(digits) for i in range(3)))
+   return (randStr + randDigs)
       
 # def get_users():
 #    search_username = request.args.get('name') #accessing the value of parameter 'name'
